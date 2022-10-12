@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package chat;
+
+option go_package = "chittychat/api/v1";
+
+import "google/protobuf/timestamp.proto";
+
+message MsgClient {
+    string name = 1;
+    string msg = 2;
+    fixed64 lclock = 3; 
+}
+
+message MsgServer {
+    string name = 1;
+    string msg = 2;
+    fixed64 lclock = 3;
+    google.protobuf.Timestamp timestamp = 4;
+}
+
+service Chat {
+    rpc Connect(stream MsgClient) returns (stream MsgServer) {}
+}
