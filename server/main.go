@@ -9,36 +9,63 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/peer"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Server struct {
 	proto.UnimplementedChatServer
-	name   string
-	port   string
-	mu     sync.Mutex
-	lclock uint64
+	name    string
+	port    string
+	mu      sync.Mutex
+	lclock  uint64
+	clients map[string]proto.Chat_ConnectServer
 }
 
 func (s *Server) Connect(stream proto.Chat_ConnectServer) error {
+	p, _ := peer.FromContext(stream.Context())
+	s.clients[p.Addr.String()] = stream
+	log.Println(p.Addr.String())
+
 	for {
 		msg, err := stream.Recv()
 		if err != nil {
-			log.Fatalf("Could not receive the message %v", err)
+			log.Printf("Could not receive the message %v", err)
+			break
 		}
 
-		log.Printf("%d - Received message from %s: %s", msg.Lclock, msg.Name, msg.Msg)
+		s.mu.Lock()
+		if msg.Lclock > s.lclock {
+			s.lclock = msg.Lclock
+		}
+		s.lclock++
+		s.mu.Unlock()
+
+		log.Printf("%v", msg)
+		log.Printf("lclock: %v", s.lclock)
+		// log.Printf("%d - Received message from %s: %s", s.lclock, msg.Name, msg.Msg)
 
 		time := time.Now().Local()
 
+		s.mu.Lock()
+		s.lclock++
+		s.mu.Unlock()
+
 		message := &proto.MsgServer{
 			Name:      s.name,
-			Msg:       "Hello " + msg.Name,
-			Lclock:    s.lclock + 1,
+			Msg:       msg.Msg,
+			Lclock:    s.lclock,
 			Timestamp: timestamppb.New(time),
 		}
-		stream.Send(message)
+
+		// stream.Send(message)
+		for _, st := range s.clients {
+			st.Send(message)
+		}
 	}
+
+	delete(s.clients, p.Addr.String())
+	return nil
 }
 
 var name = flag.String("name", "localhost", "The server name")
@@ -67,9 +94,10 @@ func main() {
 	flag.Parse() //Get the port from the command line
 
 	server := &Server{
-		name:   *name,
-		port:   *port,
-		lclock: 0,
+		name:    *name,
+		port:    *port,
+		lclock:  0,
+		clients: make(map[string]proto.Chat_ConnectServer),
 	}
 
 	go startServer(server)

@@ -22,3 +22,5 @@ message MsgServer {
 service Chat {
     rpc Connect(stream MsgClient) returns (stream MsgServer) {}
 }
+
+
