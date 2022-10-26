@@ -22,11 +22,11 @@ We call clients of the Chitty-Chat service Participants.
 
 - [x] Use gRPC for all messages passing between nodes
 - [x] Use Golang to implement the service and clients
-- [ ] Every client has to be deployed as a separate process
+- [x] Every client has to be deployed as a separate process
 - [ ] Log all service calls (Publish, Broadcast, ...) using the log package
-- [ ] Demonstrate that the system can be started with at least 3 client nodes 
-- [ ] Demonstrate that a client node can join the system
-- [ ] Demonstrate that a client node can leave the system
+- [x] Demonstrate that the system can be started with at least 3 client nodes 
+- [x] Demonstrate that a client node can join the system
+- [x] Demonstrate that a client node can leave the system
 - [ ] Optional: All elements of the Chitty-Chat service are deployed as Docker containers
 
 
