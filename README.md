@@ -13,7 +13,7 @@ We call clients of the Chitty-Chat service Participants.
 - [x] The Chitty-Chat service has to broadcast every published message, together with the current Lamport timestamp, to all participants in the system, by using gRPC. It is an implementation decision left to the students, whether a Vector Clock or a Lamport timestamp is sent.
 - [x] When a client receives a broadcasted message, it has to write the message and the current Lamport timestamp to the log
 - [x] Chat clients can join at any time. 
-- [ ] A "Participant X  joined Chitty-Chat at Lamport time L" message is broadcast to all Participants when client X joins, including the new Participant.
+- [x] A "Participant X  joined Chitty-Chat at Lamport time L" message is broadcast to all Participants when client X joins, including the new Participant.
 - [x] Chat clients can drop out at any time. 
 - [ ] A "Participant X left Chitty-Chat at Lamport time L" message is broadcast to all remaining Participants when Participant X leaves.
 
