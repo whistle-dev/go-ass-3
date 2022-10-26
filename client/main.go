@@ -33,17 +33,42 @@ func getInput() (string, error) {
 }
 
 func startClient(client *Client) {
+	fmt.Printf("Enter your username: ")
 
-	conn, err := grpc.Dial(client.name+":"+client.port, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("Could not connect to the server %v", err)
-	}
+	var connectClient proto.Chat_ConnectClient
 
-	chatClient := proto.NewChatClient(conn)
+	for {
+		conn, err := grpc.Dial(client.name+":"+client.port, grpc.WithInsecure())
+		if err != nil {
+			log.Fatalf("Could not connect to the server %v", err)
+		}
 
-	connectClient, err := chatClient.Connect(context.Background())
-	if err != nil {
-		log.Fatalf("Could not connect to the server %v", err)
+		chatClient := proto.NewChatClient(conn)
+
+		connectClient, err = chatClient.Connect(context.Background())
+		if err != nil {
+			log.Fatalf("Could not connect to the server %v", err)
+		}
+
+		username, err := getInput()
+
+		if err != nil {
+			log.Fatalf("Could not get username: %v", err)
+		}
+
+		connectClient.Send(&proto.MsgClient{
+			Name:   client.name,
+			Msg:    username,
+			Lclock: client.lclock,
+		})
+
+		msg, err1 := connectClient.Recv()
+
+		if err1 == nil {
+			fmt.Printf("%s [%s] (%d): %s\n", msg.Timestamp.AsTime().Local().Format("15:04:05"), msg.Name, client.lclock, msg.Msg)
+			break
+		}
+		fmt.Println("Username already in use, please enter a new username")
 	}
 
 	/*for {
@@ -54,8 +79,9 @@ func startClient(client *Client) {
 
 	}*/
 
+	go listenforMsg(connectClient, client)
+
 	for {
-		fmt.Print("message: ")
 		input, err := getInput()
 		if err != nil {
 			log.Fatalf("Could not retrieve user input")
@@ -73,6 +99,14 @@ func startClient(client *Client) {
 			Lclock: client.lclock,
 		})
 
+		// log.Printf("%d [%v] - Received message from %s: %s", client.lclock, msg.GetTimestamp().AsTime().Local(), msg.Name, msg.Msg)
+	}
+
+	connectClient.CloseSend()
+}
+
+func listenforMsg(connectClient proto.Chat_ConnectClient, client *Client) {
+	for {
 		msg, err := connectClient.Recv()
 		if err != nil {
 			log.Fatalf("Could not receive the message %v", err)
@@ -84,13 +118,11 @@ func startClient(client *Client) {
 
 		client.lclock++
 
-		log.Printf("%v", msg)
-		log.Printf("lclock: %v", client.lclock)
+		fmt.Printf("%s [%s] (%d): %s\n", msg.Timestamp.AsTime().Local().Format("15:04:05"), msg.Name, client.lclock, msg.Msg)
 
-		// log.Printf("%d [%v] - Received message from %s: %s", client.lclock, msg.GetTimestamp().AsTime().Local(), msg.Name, msg.Msg)
+		//log.Printf("%v", msg)
+		//log.Printf("lclock: %v", client.lclock)
 	}
-
-	connectClient.CloseSend()
 }
 
 func main() {
