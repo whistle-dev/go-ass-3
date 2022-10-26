@@ -15,7 +15,7 @@ We call clients of the Chitty-Chat service Participants.
 - [x] Chat clients can join at any time. 
 - [x] A "Participant X  joined Chitty-Chat at Lamport time L" message is broadcast to all Participants when client X joins, including the new Participant.
 - [x] Chat clients can drop out at any time. 
-- [ ] A "Participant X left Chitty-Chat at Lamport time L" message is broadcast to all remaining Participants when Participant X leaves.
+- [x] A "Participant X left Chitty-Chat at Lamport time L" message is broadcast to all remaining Participants when Participant X leaves.
 
 
 ### Technical Requirements:
