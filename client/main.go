@@ -13,6 +13,10 @@ import (
 	"google.golang.org/grpc"
 )
 
+// ANSI codes for clearing lines
+const ClearLine = "\033[2K\r"
+const ClearPreviousLine = "\033[1A\033[K"
+
 type Client struct {
 	name   string
 	port   string
@@ -91,6 +95,8 @@ func startClient(client *Client) {
 			break
 		}
 
+		fmt.Print(ClearPreviousLine)
+
 		client.lclock++
 
 		connectClient.Send(&proto.MsgClient{
@@ -117,6 +123,8 @@ func listenforMsg(connectClient proto.Chat_ConnectClient, client *Client) {
 		}
 
 		client.lclock++
+
+		// fmt.Print(ClearLine) to remove current line
 
 		fmt.Printf("%s [%s] (%d): %s\n", msg.Timestamp.AsTime().Local().Format("15:04:05"), msg.Name, client.lclock, msg.Msg)
 
