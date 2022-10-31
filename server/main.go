@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"sync"
 	"time"
 
@@ -36,19 +37,21 @@ func valueInMap(m map[string]string, value string) bool {
 }
 
 func (s *Server) Connect(stream proto.Chat_ConnectServer) error {
+	log.Println("Client connected.")
+
 	m, err := stream.Recv()
 	if err != nil {
 		log.Printf("Could not receive the message %v", err)
 	}
 
 	if valueInMap(s.clientNames, m.Msg) {
-		log.Printf("Username already exists: %v", m.Msg)
+		log.Printf("Username already exists: %v. Client will disconnect.", m.Msg)
 		return errors.New("username already exists")
 	}
 
 	p, _ := peer.FromContext(stream.Context())
 	s.clients[p.Addr.String()] = stream
-	log.Println(m.Msg + " (" + p.Addr.String() + ") connected to the server")
+	log.Printf("%s (%s) connected to the chat\n", m.Msg, p.Addr.String())
 
 	s.clientNames[p.Addr.String()] = m.Msg
 
@@ -61,18 +64,19 @@ func (s *Server) Connect(stream proto.Chat_ConnectServer) error {
 		Timestamp: timestamppb.New(timeConnect),
 	}
 
-	// stream.Send(message)
+	log.Println("Broadcast new client connection to all connected clients.")
 	for _, st := range s.clients {
 		st.Send(message)
 	}
 
 	for {
+		log.Printf("Listen for messages from client: %s\n", p.Addr.String())
 		msg, err := stream.Recv()
 
 		if err != nil {
 			//if error is EOF, the client has disconnected
 			if status.Code(err).String() == "Canceled" || status.Code(err).String() == "EOF" {
-				log.Println(m.Msg + " (" + p.Addr.String() + ") disconnected from the server")
+				log.Printf("%s (%s) disconnected from the chat\n", m.Msg, p.Addr.String())
 				break
 			} else {
 				log.Printf("Could not receive the message %v", err)
@@ -82,19 +86,20 @@ func (s *Server) Connect(stream proto.Chat_ConnectServer) error {
 
 		s.mu.Lock()
 		if msg.Lclock > s.lclock {
+			log.Printf("Client clock is bigger than server clock %d > %d, sync to client clock.\n", msg.Lclock, s.lclock)
 			s.lclock = msg.Lclock
 		}
 		s.lclock++
+		log.Printf("Increment server clock to %d\n", s.lclock)
 		s.mu.Unlock()
 
-		log.Printf("%v", msg)
-		log.Printf("lclock: %v", s.lclock)
-		// log.Printf("%d - Received message from %s: %s", s.lclock, msg.Name, msg.Msg)
+		log.Printf("Lampert: %d - Received message from %s: %s", s.lclock, msg.Name, msg.Msg)
 
 		time := time.Now().Local()
 
 		s.mu.Lock()
 		s.lclock++
+		log.Printf("Increment server clock to %d\n", s.lclock)
 		s.mu.Unlock()
 
 		message := &proto.MsgServer{
@@ -104,7 +109,7 @@ func (s *Server) Connect(stream proto.Chat_ConnectServer) error {
 			Timestamp: timestamppb.New(time),
 		}
 
-		// stream.Send(message)
+		log.Printf("Broadcast message from %s to all other clients with new server clock lampert(%d).\n", p.Addr.String(), s.lclock)
 		for _, st := range s.clients {
 			st.Send(message)
 		}
@@ -119,7 +124,7 @@ func (s *Server) Connect(stream proto.Chat_ConnectServer) error {
 		Timestamp: timestamppb.New(timeLeave),
 	}
 
-	// stream.Send(message)
+	log.Printf("Broadcast the leave of %s to other clients.\n", p.Addr.String())
 	for _, st := range s.clients {
 		st.Send(messageLeave)
 	}
@@ -133,7 +138,6 @@ var name = flag.String("name", "localhost", "The server name")
 var port = flag.String("port", "8080", "The server port")
 
 func startServer(server *Server) {
-
 	listen, err := net.Listen("tcp", server.name+":"+server.port)
 	if err != nil {
 		log.Fatalf("Could not create the server %v", err)
@@ -152,6 +156,14 @@ func startServer(server *Server) {
 }
 
 func main() {
+	f, err := os.OpenFile("log.server", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+
+	log.SetOutput(f)
+
 	flag.Parse() //Get the port from the command line
 
 	server := &Server{
@@ -167,5 +179,4 @@ func main() {
 	for {
 		time.Sleep(1 * time.Second)
 	}
-
 }

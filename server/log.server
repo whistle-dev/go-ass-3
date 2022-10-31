@@ -1,0 +1,51 @@
+2022/10/31 15:18:46 Starting server on port 8080
+2022/10/31 15:18:55 Client connected.
+2022/10/31 15:19:01 Frederik (127.0.0.1:57198) connected to the chat
+2022/10/31 15:19:01 Broadcast new client connection to all connected clients.
+2022/10/31 15:19:01 Listen for messages from client: 127.0.0.1:57198
+2022/10/31 15:19:08 Client connected.
+2022/10/31 15:19:11 Username already exists: Frederik. Client will disconnect.
+2022/10/31 15:19:11 Client connected.
+2022/10/31 15:19:14 Max (127.0.0.1:37300) connected to the chat
+2022/10/31 15:19:14 Broadcast new client connection to all connected clients.
+2022/10/31 15:19:14 Listen for messages from client: 127.0.0.1:37300
+2022/10/31 15:19:20 Client connected.
+2022/10/31 15:19:21 Niller (127.0.0.1:59714) connected to the chat
+2022/10/31 15:19:21 Broadcast new client connection to all connected clients.
+2022/10/31 15:19:21 Listen for messages from client: 127.0.0.1:59714
+2022/10/31 15:19:26 Client clock is bigger than server clock 3 > 0, sync to client clock.
+2022/10/31 15:19:26 Increment server clock to 4
+2022/10/31 15:19:26 Lampert: 4 - Received message from localhost: Hello all!
+2022/10/31 15:19:26 Increment server clock to 5
+2022/10/31 15:19:26 Broadcast message from 127.0.0.1:57198 to all other clients with new server clock lampert(5).
+2022/10/31 15:19:26 Listen for messages from client: 127.0.0.1:57198
+2022/10/31 15:19:32 Client clock is bigger than server clock 7 > 5, sync to client clock.
+2022/10/31 15:19:32 Increment server clock to 8
+2022/10/31 15:19:32 Lampert: 8 - Received message from localhost: Hello Frederik!
+2022/10/31 15:19:32 Increment server clock to 9
+2022/10/31 15:19:32 Broadcast message from 127.0.0.1:59714 to all other clients with new server clock lampert(9).
+2022/10/31 15:19:32 Listen for messages from client: 127.0.0.1:59714
+2022/10/31 15:19:44 Client clock is bigger than server clock 11 > 9, sync to client clock.
+2022/10/31 15:19:44 Increment server clock to 12
+2022/10/31 15:19:44 Lampert: 12 - Received message from localhost: Wow frederik, you took my name! I'm leaving!
+2022/10/31 15:19:44 Increment server clock to 13
+2022/10/31 15:19:44 Broadcast message from 127.0.0.1:37300 to all other clients with new server clock lampert(13).
+2022/10/31 15:19:44 Listen for messages from client: 127.0.0.1:37300
+2022/10/31 15:19:46 Max (127.0.0.1:37300) disconnected from the chat
+2022/10/31 15:19:46 Broadcast the leave of 127.0.0.1:37300 to other clients.
+2022/10/31 15:20:00 Client clock is bigger than server clock 16 > 13, sync to client clock.
+2022/10/31 15:20:00 Increment server clock to 17
+2022/10/31 15:20:00 Lampert: 17 - Received message from localhost: Then i'll leave 2, gn!
+2022/10/31 15:20:00 Increment server clock to 18
+2022/10/31 15:20:00 Broadcast message from 127.0.0.1:59714 to all other clients with new server clock lampert(18).
+2022/10/31 15:20:00 Listen for messages from client: 127.0.0.1:59714
+2022/10/31 15:20:01 Niller (127.0.0.1:59714) disconnected from the chat
+2022/10/31 15:20:01 Broadcast the leave of 127.0.0.1:59714 to other clients.
+2022/10/31 15:20:12 Client clock is bigger than server clock 21 > 18, sync to client clock.
+2022/10/31 15:20:12 Increment server clock to 22
+2022/10/31 15:20:12 Lampert: 22 - Received message from localhost: Wow guys... cya then
+2022/10/31 15:20:12 Increment server clock to 23
+2022/10/31 15:20:12 Broadcast message from 127.0.0.1:57198 to all other clients with new server clock lampert(23).
+2022/10/31 15:20:12 Listen for messages from client: 127.0.0.1:57198
+2022/10/31 15:20:14 Frederik (127.0.0.1:57198) disconnected from the chat
+2022/10/31 15:20:14 Broadcast the leave of 127.0.0.1:57198 to other clients.
